@@ -130,8 +130,17 @@ def joystick_thread():
 		print "No Joystick detected!"
 		time.sleep(5)
 
-	p1 = Player(pygame.joystick.Joystick(0),
-			rgb = COLOR_PINK)
+	# This loop will avoid trying to initialize any disconnected controllers (such as wii-mote)
+	initjoy = -1
+	for iX in range(0, pygame.joystick.get_count()):
+		js = pygame.joystick.Joystick(iX)
+		js.init()
+		if js.get_numaxes() > 0:
+			initjoy = js
+			print "Joystick #%i %s axis=%s btn=%s" % (iX,  js.get_name(), js.get_numaxes(), js.get_numbuttons())
+			break
+
+	p1 = Player(initjoy, rgb = COLOR_PINK)
 
 	PLAYERS.append(p1)
 
@@ -488,6 +497,7 @@ UNUSED STUFF
 """
 
 while True:
-	time.sleep(20000000)
+	# 2000000 causes OverflowError on Windows 8.1, Python 2.7 system
+	time.sleep(2000000)
 
 
