@@ -11,18 +11,22 @@ def setup_controls(joystick):
 	"""
 	Joystick wrapper.
 	"""
-	if re.search('playstation', joystick.get_name(), re.I):
+	name = joystick.get_name()
+	axes = joystick.get_numaxes()
+	btns = joystick.get_numbuttons()
+	if re.search('playstation', name, re.I):
 		return Ps3Controller(joystick)
 
-	elif re.search('X-box', joystick.get_name(), re.I):
+	elif re.search('X-box', name, re.I):
 		return XboxController(joystick)
 
-	elif re.search('Saitek', joystick.get_name(), re.I):
-		return MySaitekController(joystick)
-	
-	elif re.search('Thrustmaster dual analog 3.2', joystick.get_name(), re.I):
+	elif re.search('Thrustmaster dual analog 3.2', name, re.I):
 		return MyThrustController(joystick)
 
+	# this should also match generic 4-axis, 12 button dual stick
+	elif re.search('Saitek', name, re.I) or ( axes == 4 and btns == 12 ):
+		return MySaitekController(joystick)
+	
 	return Controller(joystick)
 
 class Controller(object):
@@ -97,6 +101,8 @@ class Ps3Controller(Controller):
 		# TODO: Verify
 		return self.js.get_axis(13)
 
+# This also works for
+# USB Controller - 4 axis - 12 button - generic 4 axis dual stick controller
 class MySaitekController(Controller):
 
 	def __init__(self, joystick):
