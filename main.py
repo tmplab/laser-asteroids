@@ -9,6 +9,7 @@ https://github.com/echelon
 """
 
 # STDLIB
+import getopt
 import math
 import random
 import itertools
@@ -97,14 +98,16 @@ DRAW = ps
 
 simulator = sim.SIM()
 
-def dac_thread():
+def dac_thread(load_sim):
 	global PLAYERS, DRAW
 
 	while True:
 		try:
-			d = dac.DAC(dac.find_first_dac())
-			d.play_stream(ps)
-			#simulator.play_stream(ps)
+			if load_sim == 0:
+				d = dac.DAC(dac.find_first_dac())
+				d.play_stream(ps)
+			else:
+				simulator.play_stream(ps)
 
 		except Exception as e:
 
@@ -489,15 +492,30 @@ def game_thread():
 			print "---------------------\n"
 			time.sleep(0.02)
 
-thread.start_new_thread(dac_thread, ())
-thread.start_new_thread(game_thread, ())
+def main(argv):
+	load_sim = 0
+	try:
+		opts, args = getopt.getopt(argv, "hs",["help", "simulator"])
+	except getopt.GetoptError:
+		print "python main.py [-sh]"
+		sys.exit(2)
+	for opt, args in opts:
+		if opt in ('-h', '--help'):
+			print "python main.py [-sh]"
+			print "Options:"
+			print " --help - this message"
+			print " --simulator - enable on-screen simulator, disable laser output"
+			sys.exit(2)
+		elif opt in ('-s', '--simulator'):
+			load_sim = 1
 
-"""
-UNUSED STUFF
-"""
+	thread.start_new_thread(dac_thread, (load_sim,))
+	thread.start_new_thread(game_thread, ())
 
-while True:
-	# 2000000 causes OverflowError on Windows 8.1, Python 2.7 system
-	time.sleep(2000000)
+	while True:
+		# 2000000 causes OverflowError on Windows 8.1, Python 2.7 system
+		time.sleep(2000000)
 
 
+if __name__ == "__main__":
+	main(sys.argv[1:])
