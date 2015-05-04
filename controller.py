@@ -23,6 +23,9 @@ def setup_controls(joystick):
 	elif re.search('Thrustmaster dual analog 3.2', name, re.I):
 		return MyThrustController(joystick)
 
+	elif re.search('Gamepad F310', name, re.I):
+		return MyF310Controller(joystick)
+
 	# this should also match generic 4-axis, 12 button dual stick
 	elif re.search('Saitek', name, re.I) or ( axes == 4 and btns == 12 ):
 		return MySaitekController(joystick)
@@ -149,3 +152,25 @@ class MyThrustController(Controller):
 	def getRightTrigger(self):
 		return self.js.get_button(7)
 
+class MyF310Controller(Controller):
+
+	def __init__(self, joystick):
+		super(MyF310Controller, self).__init__(joystick)
+
+	def getLeftHori(self):
+		return self.js.get_axis(0)
+
+	def getLeftVert(self):
+		return self.js.get_axis(1)
+
+	def getRightHori(self):
+		return self.js.get_axis(4)
+
+	def getRightVert(self):
+		return self.js.get_axis(3)
+
+	def getLeftTrigger(self):
+		return self.js.get_button(4)
+
+	def getRightTrigger(self):
+		return self.js.get_button(5)
